@@ -1,0 +1,7 @@
+<Window x:Class="CodexQuota.LoginWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Codex anmelden" Width="900" Height="700" WindowStartupLocation="CenterScreen">
+  <Grid>
+    <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <wv2:WebView2 x:Name="Browser" xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" />
+    <Button Grid.Row="1" Content="Anmeldung übernehmen und schließen" Click="Complete" Padding="10,7" Margin="8" HorizontalAlignment="Right"/>
+  </Grid>
+</Window>
