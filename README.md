@@ -2,13 +2,27 @@
 
 Native Windows 11 tray overlay for ChatGPT/Codex quota monitoring.
 
-## Status
+## Funktionen
 
-This is the initial scaffold. The direct usage endpoint is undocumented and may change. The WebView2 login is present; the next implementation step is to copy its authenticated cookies into `UsageClient` and parse the exact live response shape.
+- Windows-11-Tray-App ohne eigenes Taskleistenfenster
+- Overlay mit getrennten 5-Stunden- und Wochenkontingenten inklusive Reset-Zeit
+- Automatische Aktualisierung im 30-Sekunden-Intervall
+- Manuelle Anmeldung über ein eingebettetes WebView2-Fenster
+- Verschlüsselte lokale Speicherung der Anmeldedaten per Windows DPAPI
+- Einstellungen mit Live-Übernahme für Transparenz, Farbe, Vordergrund und Durchklickmodus
+- Bearbeitungsmodus mit Verschieben sowie unabhängiger Größenänderung über unsichtbare Außenränder
+- Responsive Darstellung für schmale und breite Overlay-Formate
+
+Der verwendete ChatGPT/Codex-Nutzungsendpunkt ist nicht öffentlich dokumentiert und kann sich ändern.
 
 ## Build
 
-Install the .NET 8 SDK and WebView2 Runtime, then run:
+Voraussetzungen:
+
+- .NET 8 SDK
+- Microsoft Edge WebView2 Runtime
+
+Danach im Projektordner ausführen:
 
 ```powershell
 dotnet restore

@@ -10,6 +10,10 @@ public sealed class AppSettings
     public bool ClickThrough { get; set; } = true;
     public bool AlwaysOnTop { get; set; } = true;
     public double Opacity { get; set; } = 0.92;
+    public double Brightness { get; set; } = 1.0;
+    public double Scale { get; set; } = 1.0;
+    public double OverlayWidth { get; set; } = 430;
+    public double OverlayHeight { get; set; } = 205;
     public string Foreground { get; set; } = "White";
     public string Background { get; set; } = "#CC202124";
     public double Left { get; set; } = 40;

@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace CodexQuota;
@@ -11,6 +13,21 @@ public sealed class UsageClient : IDisposable
 {
     private readonly HttpClient _http = new(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.All });
     private const string Endpoint = "https://chatgpt.com/backend-api/wham/usage";
+    private Func<Task<string>>? _browserFetcher;
+
+    public void SetBrowserFetcher(Func<Task<string>> fetcher) => _browserFetcher = fetcher;
+
+    public void SetBearerCredentials(string accessToken, string? accountId)
+    {
+        _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        _http.DefaultRequestHeaders.Remove("ChatGPT-Account-Id");
+        if (!string.IsNullOrWhiteSpace(accountId))
+            _http.DefaultRequestHeaders.TryAddWithoutValidation("ChatGPT-Account-Id", accountId);
+        _http.DefaultRequestHeaders.Remove("originator");
+        _http.DefaultRequestHeaders.TryAddWithoutValidation("originator", "Codex Desktop");
+        _http.DefaultRequestHeaders.Accept.Clear();
+        _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    }
 
     public void SetCookieHeader(string cookieHeader)
     {
@@ -18,10 +35,23 @@ public sealed class UsageClient : IDisposable
         _http.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", cookieHeader);
     }
 
+    public void ClearAuthentication()
+    {
+        _http.DefaultRequestHeaders.Authorization = null;
+        _http.DefaultRequestHeaders.Remove("ChatGPT-Account-Id");
+        _http.DefaultRequestHeaders.Remove("Cookie");
+        _browserFetcher = null;
+    }
+
     public async Task<UsageSnapshot> GetUsageAsync(CancellationToken cancellationToken = default)
     {
-        // MVP: the WebView2 login will provide cookies in the next step. Keeping this
-        // provider isolated makes the undocumented endpoint easy to replace.
+        if (_http.DefaultRequestHeaders.Authorization is null && _browserFetcher is not null)
+        {
+            var browserJson = await _browserFetcher();
+            using var browserDoc = JsonDocument.Parse(browserJson);
+            return Parse(browserDoc.RootElement);
+        }
+
         using var response = await _http.GetAsync(Endpoint, cancellationToken);
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
             throw new NotAuthenticatedException();
@@ -47,7 +77,7 @@ public sealed class UsageClient : IDisposable
             {
                 var w = ParseWindow(p.Value);
                 if (w is not null && five is null && (name.Contains("5") || name.Contains("session") || name.Contains("hour") || name.Contains("primary"))) five = w;
-                if (w is not null && week is null && (name.Contains("week") || name.Contains("7d") || name.Contains("weekly"))) week = w;
+                if (w is not null && week is null && (name.Contains("week") || name.Contains("7d") || name.Contains("weekly") || name.Contains("secondary"))) week = w;
                 Visit(p.Value, ref five, ref week);
             }
         }
@@ -60,6 +90,13 @@ public sealed class UsageClient : IDisposable
         return used is null && reset is null ? null : new(Math.Clamp(100 - (used ?? 0), 0, 100), reset);
     }
     private static double? Number(JsonElement e, string name) => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.Number && v.TryGetDouble(out var n) ? n : null;
-    private static DateTimeOffset? Date(JsonElement e, string name) => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String && DateTimeOffset.TryParse(v.GetString(), out var d) ? d : null;
+    private static DateTimeOffset? Date(JsonElement e, string name)
+    {
+        if (!e.TryGetProperty(name, out var v)) return null;
+        if (v.ValueKind == JsonValueKind.String && DateTimeOffset.TryParse(v.GetString(), out var textDate)) return textDate;
+        if (v.ValueKind == JsonValueKind.Number && v.TryGetInt64(out var unix))
+            return DateTimeOffset.FromUnixTimeSeconds(unix > 10_000_000_000 ? unix / 1000 : unix);
+        return null;
+    }
     public void Dispose() => _http.Dispose();
 }

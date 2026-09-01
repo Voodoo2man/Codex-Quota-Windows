@@ -8,6 +8,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>CodexQuota</AssemblyName>
     <RootNamespace>CodexQuota</RootNamespace>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />

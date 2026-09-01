@@ -2,7 +2,7 @@ using System.Windows;
 
 namespace CodexQuota;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     private MainWindow? _main;
 
@@ -13,12 +13,7 @@ public partial class App : Application
         _main = new MainWindow(settings);
         _main.Show();
         if (settings.FirstRun)
-        {
-            var login = new LoginWindow(_main);
-            login.ShowDialog();
-            settings.FirstRun = false;
-            settings.Save();
-        }
+            _main.OpenLogin();
         await _main.StartAsync();
     }
 

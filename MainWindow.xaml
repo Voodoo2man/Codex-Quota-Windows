@@ -1,19 +1,25 @@
-<Window x:Class="CodexQuota.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False"
-        Background="Transparent" AllowsTransparency="True"
-        Width="310" Height="112" ShowActivated="False">
-  <Border x:Name="Card" CornerRadius="12" Padding="14" Background="#CC202124" BorderBrush="#55FFFFFF" BorderThickness="1">
-    <Grid>
-      <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-      <TextBlock Text="CODEX-KONTINGENT" FontSize="11" Foreground="#BFFFFFFF" FontWeight="SemiBold"/>
-      <Grid Grid.Row="1" Margin="0,5,0,0">
-        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-        <StackPanel><TextBlock Text="5 Stunden" Foreground="#CCFFFFFF" FontSize="12"/><TextBlock x:Name="FiveHourText" Text="–" Foreground="White" FontSize="22" FontWeight="Bold"/></StackPanel>
-        <StackPanel Grid.Column="1"><TextBlock Text="Woche" Foreground="#CCFFFFFF" FontSize="12"/><TextBlock x:Name="WeekText" Text="–" Foreground="White" FontSize="22" FontWeight="Bold"/></StackPanel>
+<Window x:Class="CodexQuota.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" Background="Transparent" AllowsTransparency="True" UseLayoutRounding="True" SnapsToDevicePixels="True" Width="430" Height="205" ShowActivated="False">
+  <Window.Resources>
+    <LinearGradientBrush x:Key="CardBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#B52B3445"/><GradientStop Color="#D5161B27" Offset="1"/></LinearGradientBrush>
+    <Style TargetType="ProgressBar"><Setter Property="Height" Value="6"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Background" Value="#30FFFFFF"/></Style>
+    <Style TargetType="Thumb"><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Thumb"><Border Background="Transparent"/></ControlTemplate></Setter.Value></Setter></Style>
+    <Style TargetType="TextBlock"><Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#000000" BlurRadius="2" ShadowDepth="0" Opacity="0.9"/></Setter.Value></Setter></Style>
+  </Window.Resources>
+  <Grid SizeChanged="ResponsiveLayoutChanged">
+    <Border x:Name="Card" CornerRadius="18" Padding="16" Background="{StaticResource CardBrush}" BorderBrush="#65FFFFFF" BorderThickness="1">
+      <Border.Effect><DropShadowEffect BlurRadius="24" ShadowDepth="8" Direction="270" Opacity="0.38" Color="#000000"/></Border.Effect>
+      <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Orientation="Horizontal"><Ellipse Width="8" Height="8" Fill="#4ADE80" Margin="0,0,8,0" VerticalAlignment="Center"/><TextBlock Text="CODEX QUOTA" Foreground="#E5E7EB" FontSize="11" FontWeight="SemiBold"/></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><TextBlock x:Name="LastUpdatedText" Text="--:--:--" Foreground="#A7F3D0" FontSize="9" Margin="0,1,10,0" VerticalAlignment="Center"/><TextBlock Text="LIVE" Foreground="#86EFAC" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/></StackPanel></Grid>
+        <UniformGrid x:Name="QuotaGrid" Grid.Row="1" Columns="2" Margin="0,14,0,12">
+          <Border Background="#18FFFFFF" CornerRadius="10" Padding="11,9" Margin="0,0,6,0"><StackPanel><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="5 STUNDEN" Foreground="#C7D2FE" FontSize="10" FontWeight="Bold"/><TextBlock x:Name="FiveHourText" Grid.Column="1" Text="–" Foreground="White" FontSize="20" FontWeight="SemiBold"/></Grid><ProgressBar x:Name="FiveHourBar" Margin="0,9,0,0" Minimum="0" Maximum="100" Value="0" Foreground="#818CF8"/><TextBlock x:Name="FiveHourResetText" Text="Reset –" Foreground="#A5B4FC" FontSize="9" Margin="0,6,0,0"/></StackPanel></Border>
+          <Border Background="#18FFFFFF" CornerRadius="10" Padding="11,9" Margin="6,0,0,0"><StackPanel><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="WOCHE" Foreground="#A5F3FC" FontSize="10" FontWeight="Bold"/><TextBlock x:Name="WeekText" Grid.Column="1" Text="–" Foreground="White" FontSize="20" FontWeight="SemiBold"/></Grid><ProgressBar x:Name="WeekBar" Margin="0,9,0,0" Minimum="0" Maximum="100" Value="0" Foreground="#22D3EE"/><TextBlock x:Name="WeekResetText" Text="Reset –" Foreground="#A5F3FC" FontSize="9" Margin="0,6,0,0"/></StackPanel></Border>
+        </UniformGrid>
+        <Grid Grid.Row="2"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="StatusText" Text="Verbindung wird geprüft …" Foreground="#A1A1AA" FontSize="10"/><TextBlock x:Name="EditHint" Text="Ziehen · Griff für Größe" Foreground="#CBD5E1" FontSize="10" Grid.Column="1" Visibility="Collapsed"/></Grid>
       </Grid>
-      <TextBlock x:Name="StatusText" Grid.Row="2" Text="Nicht angemeldet" Foreground="#AAFFFFFF" FontSize="10"/>
-    </Grid>
-  </Border>
+    </Border>
+    <Thumb x:Name="RightResizeEdge" Background="Transparent" Width="10" HorizontalAlignment="Right" Cursor="SizeWE" Visibility="Collapsed" Tag="Right" DragDelta="ResizeEdge_DragDelta"/>
+    <Thumb x:Name="BottomResizeEdge" Background="Transparent" Height="10" VerticalAlignment="Bottom" Cursor="SizeNS" Visibility="Collapsed" Tag="Bottom" DragDelta="ResizeEdge_DragDelta"/>
+    <Thumb x:Name="CornerResizeEdge" Background="Transparent" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" Visibility="Collapsed" Tag="Corner" DragDelta="ResizeEdge_DragDelta"/>
+  </Grid>
 </Window>
