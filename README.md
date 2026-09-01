@@ -2,6 +2,8 @@
 
 Native Windows 11 tray overlay for ChatGPT/Codex quota monitoring.
 
+![CodexQuota Vorschau](Apppicture.png)
+
 ## Funktionen
 
 - Windows-11-Tray-App ohne eigenes Taskleistenfenster
